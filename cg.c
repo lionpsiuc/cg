@@ -231,55 +231,48 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
 }
 
 int main() {
-  // int    N_values[] = {8, 16, 32, 64, 128, 256};
-  // int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
-  // double tol        = 1e-8;  // Tolerance for convergence
-  // int    max_iter   = 10000; // Maximum number of iterations
-  // printf("N\tIterations\tTime (s)\tFinal Residual\n");
-  // printf("------------------------------------------------------\n");
+  int    N_values[] = {8, 16, 32, 64, 128, 256};
+  int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
+  double tol        = 1e-8;  // Tolerance for convergence
+  int    max_iter   = 10000; // Maximum number of iterations
+  printf("N\tIterations\tTime (s)\tFinal Residual\n");
+  printf("------------------------------------------------------\n");
 
-  // // Run the algorithm for each grid size
-  // for (int i = 0; i < num_N; i++) {
-  //   int N    = N_values[i];
-  //   int size = N * N;
+  // Run the algorithm for each grid size
+  for (int i = 0; i < num_N; i++) {
+    int N    = N_values[i];
+    int size = N * N;
 
-  //   // Allocate memory
-  //   double* b = (double*) malloc(size * sizeof(double));
-  //   double* x = (double*) malloc(size * sizeof(double));
+    // Allocate memory
+    double* b = (double*) malloc(size * sizeof(double));
+    double* x = (double*) malloc(size * sizeof(double));
 
-  //   // Create right-hand side vector
-  //   rhs(b, N, f);
+    // Create right-hand side vector
+    rhs(b, N, f);
 
-  //   // Do a single run first in order to get an iteration count
-  //   int    iter_count;
-  //   double final_residual;
-  //   cg(b, x, N, tol, max_iter, &iter_count, &final_residual);
+    // Do a single run first in order to get an iteration count
+    int    iter_count;
+    double final_residual;
+    cg(b, x, N, tol, max_iter, &iter_count, &final_residual);
 
-  //   // Mulitple runs for accurate timings as per the assignment
-  //   int     num_runs = 5;
-  //   clock_t start    = clock();
-  //   for (int run = 0; run < num_runs; run++) {
-  //     for (int j = 0; j < size; j++) {
-  //       x[j] = 0.0;
-  //     }
-  //     cg(b, x, N, tol, max_iter, &iter_count, &final_residual);
-  //   }
-  //   clock_t end        = clock();
-  //   double  time_spent = (double) (end - start) / (CLOCKS_PER_SEC *
-  //   num_runs);
+    // Mulitple runs for accurate timings as per the assignment
+    int     num_runs = 5;
+    clock_t start    = clock();
+    for (int run = 0; run < num_runs; run++) {
+      for (int j = 0; j < size; j++) {
+        x[j] = 0.0;
+      }
+      cg(b, x, N, tol, max_iter, &iter_count, &final_residual);
+    }
+    clock_t end        = clock();
+    double  time_spent = (double) (end - start) / (CLOCKS_PER_SEC * num_runs);
 
-  //   printf("%d\t%d\t\t%.6f\t%.10e\n", N, iter_count, time_spent,
-  //          final_residual);
+    printf("%d\t%d\t\t%.6f\t%.10e\n", N, iter_count, time_spent,
+           final_residual);
 
-  //   // Free memory
-  //   free(b);
-  //   free(x);
-  // }
-  // return 0;
-  int     N    = 3;
-  int     size = N * N;
-  double* A    = (double*) malloc(size * size * sizeof(double));
-  fd(A, N);
-  free(A);
+    // Free memory
+    free(b);
+    free(x);
+  }
   return 0;
 }
