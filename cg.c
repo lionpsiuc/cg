@@ -151,15 +151,84 @@ void test() {
   free(y2);
 }
 
+// Conjugate gradient algorithm
+void cg(double* b, double* x, int N, double tol, int max_iter) {
+  int size = N * N;
+
+  // Allocate memory for vectors
+  double* r  = (double*) malloc(size * sizeof(double));
+  double* p  = (double*) malloc(size * sizeof(double));
+  double* Ap = (double*) malloc(size * sizeof(double));
+
+  // Initialise to zeros (i.e., our initial guess)
+  for (int i = 0; i < size; i++) {
+    x[i] = 0.0;
+  }
+
+  // r_0=b-Ax_0=b, since x_0=0
+  for (int i = 0; i < size; i++) {
+    r[i] = b[i];
+    p[i] = r[i]; // p_0=r_0
+  }
+
+  double rr               = dot(r, r, size);
+  double initial_residual = sqrt(rr);
+  int    k;
+  for (k = 0; k < max_iter; k++) {
+
+    // Check for convergence
+    double residual_norm = sqrt(rr);
+    if (residual_norm <= tol * initial_residual || residual_norm <= tol) {
+      break;
+    }
+
+    // Compute Ap
+    poisson(p, Ap, N);
+
+    // a_k=(r_k,r_k)/(Ap_k,p_k)
+    double pAp   = dot(p, Ap, size);
+    double alpha = rr / pAp;
+
+    // x_{k+1}=x_k+a_kp_k and r_{k+1}=r_k-a_kAp_k
+    for (int i = 0; i < size; i++) {
+      x[i] += alpha * p[i];
+      r[i] -= alpha * Ap[i];
+    }
+
+    // Calculate the new rr for B_k
+    double rr_new = dot(r, r, size);
+
+    // B_k=(r_{k+1},r_{k+1})/(r_k,r_k)
+    double beta = rr_new / rr;
+
+    // Update rr for the next iteration
+    rr = rr_new;
+
+    // p_{k+1}=r_{k+1}+B_kp_k
+    for (int i = 0; i < size; i++) {
+      p[i] = r[i] + beta * p[i];
+    }
+  }
+  printf("CG converged in %d iterations to a residual of %.10e\n", k, sqrt(rr));
+
+  // Free memory
+  free(r);
+  free(p);
+  free(Ap);
+}
+
 int main() {
   int     N    = 3;
   int     size = N * N;
   double* b    = (double*) malloc(size * sizeof(double));
+  double* x    = (double*) malloc(size * sizeof(double));
   rhs(b, N, f);
-  for (int i = 0; i < size; i++) {
-    printf("%6.4f\n", b[i]);
-  }
-  test();
+  cg(b, x, N, 1e-8, 1000);
+  // for (int i = 0; i < size; i++) {
+  //   printf("%6.4f\n", b[i]);
+  // }
+  // test();
   free(b);
+  free(x);
   return 0;
 }
