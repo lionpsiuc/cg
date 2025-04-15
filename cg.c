@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+double f(double x1, double x2) {
+  return 2.0 * M_PI * M_PI * sin(M_PI * x1) * sin(M_PI * x2);
+}
+
 void createMatrix(double* A, int N) {
   double h      = 1.0 / ((double) N + 1); // Grid spacing
   double h2_inv = 1.0 / (h * h);
