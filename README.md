@@ -4,7 +4,7 @@
 
 ### Mathematical Background
 
-As per the assignment instructions, we are tasked with implementing a Poisson problem on a unit square.
+As per the assignment instructions, we are tasked with implementing a Poisson problem on a unit square and then solving it using the conjugate gradient (CG) method.
 
 #### The Poisson Problem
 
@@ -16,9 +16,9 @@ We are given the Poisson problem on the unit square $\Omega=(0,1)^2$:
 
 where $\Delta u(x)=\frac{\partial^2u}{\partial x_1^2}+\frac{\partial^2u}{\partial x_2^2}$ is the Laplacian operator.
 
-#### Discretisation Approach
+##### Discretisation Approach
 
-##### Grid
+###### Grid
 
 We discretise the domain using a uniform grid with $N$ internal points in each direction:
 
@@ -26,7 +26,7 @@ We discretise the domain using a uniform grid with $N$ internal points in each d
 - Our grid points are $(x_1,x_2)=(ih,jh)$ for $i,j=1,2,\ldots,N$.
 - The boundary points occur at $i,j=0$ or $i,j=N+1$ in the case that $u=0$.
 
-##### Finite Difference Approximation
+###### Finite Difference Approximation
 
 For the Laplacian operator, we use the standard five-point stencil approximation:
 
@@ -42,7 +42,7 @@ Furthermore, we rearrange in order to match the form $Ax=b$:
 
 > Note that we do not show the derivation of this explicitly; this is because it is taken from the High-Performance Computing Software II module. More specifically, please see `notes.pdf` where the derivation is given in full.
 
-##### Ordering of the Grid Points
+###### Ordering of the Grid Points
 
 We use row-major ordering:
 
