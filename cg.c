@@ -184,6 +184,22 @@ void verify_solution(double* numerical, int N) {
   printf("L2 error: %.10e\n\n", l2_error);
 }
 
+// Function to write the analytical solution to a file for plotting
+void write_analytical_solution(int N, const char* filename) {
+  double h  = 1.0 / ((double) N + 1);
+  FILE*  fp = fopen(filename, "w");
+  for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+      double x1    = (i + 1) * h;
+      double x2    = (j + 1) * h;
+      double exact = analytical_solution(x1, x2);
+      fprintf(fp, "%f %f %f\n", x1, x2, exact);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+}
+
 int main() {
   int    N_values[] = {8, 16, 32, 64, 128, 256};
   int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
@@ -231,6 +247,11 @@ int main() {
     char filename[50];
     sprintf(filename, "solution-%d.dat", N);
     write_solution(x, N, filename);
+
+    // Write analytical solution for comparison
+    char analytical_filename[50];
+    sprintf(analytical_filename, "analytical-%d.dat", N);
+    write_analytical_solution(N, analytical_filename);
 
     // Free memory
     free(b);
