@@ -227,10 +227,10 @@ int main() {
     // // Add verification against analytical solution
     // verify_solution(x, N);
 
-    // For one grid size, we output the solution to a file for plotting
-    if (N == 128) {
-      write_solution(x, N, "solution.dat");
-    }
+    // Save the computed solution to a file for plotting
+    char filename[50];
+    sprintf(filename, "solution-%d.dat", N);
+    write_solution(x, N, filename);
 
     // Free memory
     free(b);
