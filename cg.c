@@ -1,9 +1,11 @@
 /**
  * @file cg.c
  *
- * @brief Brief explanation.
+ * @brief Implementation of a serial conjugate gradient (CG) solver for the
+ *        Poisson problem.
  *
- * Further explanation, if required.
+ * This programme solves the Poisson equation on a unit square with Dirichlet
+ * boundary conditions using the CG method.
  */
 
 #include <math.h>
@@ -12,13 +14,13 @@
 #include <time.h>
 
 /**
- * @brief Brief explanation.
+ * @brief Computes the dot product of two vectors.
  *
- * Further explanation, if required.
+ * @param[in] x First vector.
+ * @param[in] y Second vector.
+ * @param[in] size Size of the vectors.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @return The dot product value.
  */
 double dot(double* x, double* y, int size) {
   double result = 0.0;
@@ -29,26 +31,27 @@ double dot(double* x, double* y, int size) {
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Right-hand side function for the Poisson problem.
  *
- * Further explanation, if required.
+ * @param[in] x1 First coordinate.
+ * @param[in] x2 Second coordinate.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @return Value of the function at the given coordinates.
  */
 double f(double x1, double x2) {
   return 2.0 * M_PI * M_PI * sin(M_PI * x1) * sin(M_PI * x2);
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Applies the discrete Poisson operator (i.e., a matrix-vector product).
  *
- * Further explanation, if required.
+ * Implements the matrix-vector product y=Ax where A is the discrete Laplacian
+ * matrix using the standard five-point stencil. This function avoids explicitly
+ * storing the matrix A.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @param[in] x Input vector.
+ * @param[out] y Output vector (i.e., Ax).
+ * @param[in] N Number of grid points in each dimension.
  */
 void poisson(double* x, double* y, int N) {
   double h      = 1.0 / ((double) N + 1); // Grid spacing
@@ -85,13 +88,14 @@ void poisson(double* x, double* y, int N) {
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Constructs the right-hand side vector for the linear system.
  *
- * Further explanation, if required.
+ * Populates the vector b with values of the function f evaluated at grid
+ * points.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @param[out] b Vector to be filled with right-hand side values.
+ * @param[in] N Number of grid points in each dimension.
+ * @param[in] f Pointer to function evaluating the right-hand side.
  */
 void rhs(double* b, int N, double (*f)(double, double)) {
   double h = 1.0 / ((double) N + 1);
@@ -106,14 +110,16 @@ void rhs(double* b, int N, double (*f)(double, double)) {
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Writes the numerical solution to a file.
  *
- * Further explanation, if required.
+ * Saves the computed solution u along with the coordinates of each grid point
+ * to a file for visualisation and analysis.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @param[in] u Vector containing the solution values.
+ * @param[in] N Number of grid points in each dimension.
+ * @param[in] filename Name of the output file.
  */
+
 void write_solution(double* u, int N, const char* filename) {
   double h  = 1.0 / ((double) N + 1);
   FILE*  fp = fopen(filename, "w");
@@ -130,13 +136,20 @@ void write_solution(double* u, int N, const char* filename) {
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Implements the CG algorithm.
  *
- * Further explanation, if required.
+ * Solves the linear system Ax=b using the CG method where A is the discrete
+ * Laplacian. The algorithm terminates when either the maximum number of
+ * iterations is reached or the residual norm falls below the specified
+ * tolerance.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @param[in] b Right-hand side vector.
+ * @param[out] x Solution vector.
+ * @param[in] N Number of grid points in each dimension.
+ * @param[in] tol Convergence tolerance.
+ * @param[in] max_iter Maximum number of iterations.
+ * @param[out] iter_count Number of iterations performed.
+ * @param[out] final_residual Final residual norm.
  */
 void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
         double* final_residual) {
@@ -209,59 +222,28 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Computes the analytical solution to the Poisson problem.
  *
- * Further explanation, if required.
+ * Returns the exact solution to the Poisson equation with zero Dirichlet
+ * boundary conditions.
  *
- * @param[in/out/in,out] param Brief explanation.
+ * @param[in] x1 First coordinate.
+ * @param[in] x2 Second coordinate.
  *
- * @return Brief explanation.
+ * @return Exact solution value at the given coordinates.
  */
 double analytical_solution(double x1, double x2) {
   return sin(M_PI * x1) * sin(M_PI * x2);
 }
 
 /**
- * @brief Brief explanation.
+ * @brief Writes the analytical solution to a file.
  *
- * Further explanation, if required.
+ * Evaluates and saves the exact solution along with the coordinates of each
+ * grid point to a file for visualisation and comparison.
  *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
- */
-void verify_solution(double* numerical, int N) {
-  double h         = 1.0 / ((double) N + 1);
-  double max_error = 0.0;
-  double l2_error  = 0.0;
-  for (int j = 0; j < N; j++) {
-    for (int i = 0; i < N; i++) {
-      int    index = j * N + i;
-      double x1    = (i + 1) * h;
-      double x2    = (j + 1) * h;
-      double exact = analytical_solution(x1, x2);
-      double error = fabs(numerical[index] - exact);
-      max_error    = fmax(max_error, error);
-      l2_error += error * error;
-    }
-  }
-
-  // Compute root mean square deviation
-  l2_error = sqrt(l2_error / (N * N));
-
-  printf("\nVerification against analytical solution:\n");
-  printf("Maximum error: %.10e\n", max_error);
-  printf("L2 error: %.10e\n\n", l2_error);
-}
-
-/**
- * @brief Brief explanation.
- *
- * Further explanation, if required.
- *
- * @param[in/out/in,out] param Brief explanation.
- *
- * @return Brief explanation.
+ * @param[in] N Number of grid points in each dimension.
+ * @param[in] filename Name of the output file.
  */
 void write_analytical_solution(int N, const char* filename) {
   double h  = 1.0 / ((double) N + 1);
@@ -281,9 +263,8 @@ void write_analytical_solution(int N, const char* filename) {
 /**
  * @brief Main function.
  *
- * Further explanation, if required.
- *
- * @param[in/out/in,out] param Brief explanation.
+ * Runs the CG algorithm for multiple grid sizes, measures performance, and
+ * writes both numerical and analytical solutions to files.
  *
  * @return 0 upon successful execution.
  */
