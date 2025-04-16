@@ -12,11 +12,15 @@
   - [Key Components](#key-components)
   - [Usage Instructions](#usage-instructions)
   - [Output Files](#output-files)
+- [Short Explanation of Code](#short-explanation-of-code)
+  - [`sparse/`](#sparse)
+  - [`dense/`](#dense)
 - [Serial Implementation of the Conjugate Gradient Algorithm](#serial-implementation-of-the-conjugate-gradient-algorithm)
   - [Mathematical Explanation for Convergence in One Iteration](#mathematical-explanation-for-convergence-in-one-iteration)
   - [Updated Solution](#updated-solution)
   - [Graphs](#graphs)
   - [Discussion of Findings](#discussion-of-findings)
+- [Convergence of the Conjugate Gradient Algorithm](#convergence-of-the-conjugate-gradient-algorithm)
 
 ### Mathematical Background
 
@@ -69,10 +73,20 @@ We use row-major ordering:
 
 #### Key Components
 
+We first explain the files found in `sparse/` which are relevant for the first and second questions of the assignment:
+
 - `cg.c`: The main implementation of the CG solver.
 - `numerical.py` and `analytical.py`: These Python scripts visualise the computed solutions and analytical solutions, respectively. They read the `.dat` files produced by `cg.c` and generate heatmaps for different grid sizes.
 
+For `dense/`, it is as follows:
+
+- `cg.c`: The main implementation of the CG solver for the dense system.
+- `condition.py`: A Python script for computing the condition number; note that one must change the value of `N` manually.
+- `plot.py`: Python script to allow the plotting of the resdiual history against the theoretical bounds given in the assignment.
+
 #### Usage Instructions
+
+Note that there is a separate `Makefile` in each directory. For `sparse/` and `dense/`, we have the following:
 
 - **Build and Run Everything**:
 
@@ -94,7 +108,7 @@ We use row-major ordering:
 
 #### Output Files
 
-The programme generates numerous output files:
+For `sparse/`, the programme generates numerous output files:
 
 - `solution-N.dat`: Contains the numerical solution for grid size `N`.
 - `analytical-N.dat`: Contains the analytical solution for grid size `N`.
@@ -102,9 +116,32 @@ The programme generates numerous output files:
 - `numerical-1.png`: Visualisation of all numerical solutions in the case where our initial guess is a vector of ones (this is the implementation which is present in `cg.c`).
 - `analytical.png`: Visualisation of all analytical solutions in the case where our initial guess is a vector of ones.
 
+For `dense/`, the programme generates numerous output files:
+
+- `residuals-N.dat`: Contains the residual history for grid size `N`.
+- `convergence.png`: Plots of the residual histories against the theoretical bounds.
+
+### Short Explanation of Code
+
+#### `sparse/`
+
+The code in this directory focuses on the Poisson problem and its solution using a serial CG method:
+
+- **Discretisation of the Poisson Problem (i.e., `sparse/cg.c`)**: The code discretises the continuous Poisson problem using the five-point stencil described in the [Mathematical Background](#mathematical-background) section. The function `poisson` implements the discrete Laplacian operator without explicitly forming the matrix $A$, saving significant memory. The matrix-vector product is computed directly by applying the finite difference stencil to each grid point, following the row-major ordering scheme.
+- **Right-Hand Side Setup (i.e., `rhs` Function)**: Implements $f(x)=2\pi^2\sin(\pi x_1)\sin(\pi x_2)$ as specified in the assignment. Evaluates this function at each interior grid point to form the right-hand side vector.
+- **Conjugate Gradient Implementation (i.e., `cg` Function)**: Follows the standard CG algorithm (i.e., Algorithm 6.19 in Iterative Methods for Sparse Linear Systems, 2nd Ed., Yousef Saad) with optimisations (e.g., memory efficiency is maintained by only storing vectors, not matrices).
+
+#### `dense/`
+
+The code in this directory examines the convergence behaviour of CG for the specified dense linear system:
+
+- **Dense Matrix Implementation (`dense_matvec` Function)**: Implements the matrix with entries $A_{i,j}=\frac{N-|i-j|}{N}$ without explicitly storing the matrix. Moreover, it uses OpenMP parallelisation to improve performance.
+- **Stopping Criterion Implementation**: Implements the requested criterion (i.e., $|r_k|\leq\max(\texttt{reltol}|r_0|,\texttt{abstol})$). The machine epsilon is determined by the compiler's `DBL_EPSILON` constant.
+- **Convergence Analysis**: Tracks and stores the residual norm at each iteration, enabling detailed convergence analysis. The `write_residuals` function outputs this data for subsequent visualisation. The Python script `condition.py` computes the spectral condition number $\kappa(A)$ required for the theoretical bound.
+
 ### Serial Implementation of the Conjugate Gradient Algorithm
 
-In our first run of the implementation, we used an initial guess of zeros which resulted in the following output:
+The serial implementation can be found in `sparse/`. In our first run of the implementation, we used an initial guess of zeros which resulted in the following output:
 
 ```bash
 N       Iterations      Time (s)        Final Residual
@@ -243,14 +280,14 @@ N       Iterations      Time (s)        Final Residual
 
 We plot all six (i.e., for $N=8,\ldots,256$) resulting functions $u(x)$ for both cases (i.e., the one where it terminates in one iteration, and the other where we updated our initial guess). The first is for the case where we have an initial guess of zeros (i.e., the algorithm terminating in one iteration) and the second is for the updated case where we have a proper number of iterations:
 
-![Solutions when our initial guess is a vector of zeros](numerical-0.png)
-![Solutions when our initial guess is a vector of ones](numerical-1.png)
+![Solutions when our initial guess is a vector of zeros](sparse/numerical-0.png)
+![Solutions when our initial guess is a vector of ones](sparse/numerical-1.png)
 
 As we can see, they are essentially identical.
 
 For comparison, we present the analytical solution for each $N$ below:
 
-![Analytical solutions](analytical.png)
+![Analytical solutions](sparse/analytical.png)
 
 #### Discussion of Findings
 
@@ -269,3 +306,23 @@ We can organise the above findings into a set of important observations:
 3. **Computational Efficiency**:
 
     - The implementation avoids storing the full matrix $A$ explicitly, instead using the `poisson` function to compute matrix-vector products directly. This approach significantly reduces memory requirements from $\mathcal{O}(N^4)$ to $\mathcal{O}(N^2)$.
+
+### Convergence of the Conjugate Gradient Algorithm
+
+We first mention how we obtained the condition numbers. Using `condition.py`, and by manually changing `N` to the required values (i.e., `100`, `1000`, and `10000`), we obtained them through the ratio given in the assignment. For example, running using
+
+```bash
+(cases) ionlipsiuc@Desktop:~/cg/dense$ python3 condition.py
+```
+
+outputs the following:
+
+```bash
+Condition number for N = 1000: 1351031.1299646497
+```
+
+The condition numbers are then hard-coded into `plot.py` where the theoretical bounds are also calculated. We present the requested plot below:
+
+![Convergence of residuals](dense/convergence.png)
+
+We can see that the theoretical bounds are quite conservative. The bound given is one where every iteration makes the minimal possible progress permitted as per the theory. This bound is one where the eigenvalues are distributed in the worst possible way. Moreover, the initial error has components in all eigendirections and if it is heavily weighted toward these extremes, then convergence will be slower.
