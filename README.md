@@ -8,6 +8,7 @@
       - [Grid](#grid)
       - [Finite Difference Approximation](#finite-difference-approximation)
       - [Ordering of the Grid Points](#ordering-of-the-grid-points)
+- [Folder Structure and Usage Details](#folder-structure-and-usage-details)
 - [Serial Implementation of the Conjugate Gradient Algorithm](#serial-implementation-of-the-conjugate-gradient-algorithm)
   - [Mathematical Explanation for Convergence in One Iteration](#mathematical-explanation-for-convergence-in-one-iteration)
   - [Updated Solution](#updated-solution)
@@ -60,6 +61,10 @@ We use row-major ordering:
 
 - Move left to right, and then top to bottom.
 - Our index $k=jN+i$ for a grid point $(ih,jh)$.
+
+### Folder Structure and Usage Details
+
+
 
 ### Serial Implementation of the Conjugate Gradient Algorithm
 
