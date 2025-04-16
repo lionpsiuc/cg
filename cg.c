@@ -93,7 +93,7 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
   double* p  = (double*) malloc(size * sizeof(double));
   double* Ap = (double*) malloc(size * sizeof(double));
 
-  // Initialise to zeros (i.e., our initial guess)
+  // Initialise to ones (i.e., our initial guess)
   for (int i = 0; i < size; i++) {
     x[i] = 1.0;
   }
