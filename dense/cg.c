@@ -170,9 +170,13 @@ void dense_cg(double* b, double* x, int N, double abstol, double reltol,
 }
 
 /**
- * @brief Runs the dense matrix convergence tests from section 3.3.
+ * @brief Main function.
+ *
+ * Runs the dense matrix convergence tests.
+ *
+ * @return 0 upon successful execution.
  */
-void run_dense_matrix_tests() {
+int main() {
   int    N_values[] = {100, 1000, 10000};
   int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
   int    max_iter   = 100000;      // Maximum number of iterations
@@ -220,16 +224,5 @@ void run_dense_matrix_tests() {
     free(x);
     free(residuals);
   }
-}
-
-/**
- * @brief Main function.
- *
- * Runs the dense matrix convergence test.
- *
- * @return 0 upon successful execution.
- */
-int main() {
-  run_dense_matrix_tests();
   return 0;
 }
