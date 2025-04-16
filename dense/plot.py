@@ -10,6 +10,17 @@ condition_numbers = {
 
 
 def theoretical_bound(k, kappa, initial_error=1.0):
+    """
+    Calculates the theoretical convergence bound.
+
+    Args:
+        k (int): Iteration number.
+        kappa (float): Condition number of the matrix.
+        initial_error (float, optional): Magnitude of the initial error. Defaults to 1.0.
+
+    Returns:
+        float: Upper bound on the relative error.
+    """
     factor = (np.sqrt(kappa) - 1) / (np.sqrt(kappa) + 1)
     return 2 * (factor**k) * initial_error
 
