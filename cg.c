@@ -188,7 +188,7 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
 
   // Initialise to zeros (i.e., our initial guess)
   for (int i = 0; i < size; i++) {
-    x[i] = 1.0;
+    x[i] = 0.0;
   }
 
   // r_0=b-Ax_0=b, since x_0=0
@@ -246,6 +246,36 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
   *final_residual = sqrt(rr);
 }
 
+// Known analytical solution
+double analytical_solution(double x1, double x2) {
+  return sin(M_PI * x1) * sin(M_PI * x2);
+}
+
+// Function to verify numerical solution against analytical solution
+void verify_solution(double* numerical, int N) {
+  double h         = 1.0 / ((double) N + 1);
+  double max_error = 0.0;
+  double l2_error  = 0.0;
+  for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+      int    index = j * N + i;
+      double x1    = (i + 1) * h;
+      double x2    = (j + 1) * h;
+      double exact = analytical_solution(x1, x2);
+      double error = fabs(numerical[index] - exact);
+      max_error    = fmax(max_error, error);
+      l2_error += error * error;
+    }
+  }
+
+  // Compute root mean square deviation
+  l2_error = sqrt(l2_error / (N * N));
+
+  printf("\nVerification against analytical solution:\n");
+  printf("Maximum error: %.10e\n", max_error);
+  printf("L2 error: %.10e\n\n", l2_error);
+}
+
 int main() {
   int    N_values[] = {8, 16, 32, 64, 128, 256};
   int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
@@ -285,6 +315,9 @@ int main() {
 
     printf("%d\t%d\t\t%.6f\t%.10e\n", N, iter_count, time_spent,
            final_residual);
+
+    // Add verification against analytical solution
+    verify_solution(x, N);
 
     // For one grid size, we output the solution to a file for plotting
     if (N == 128) {
