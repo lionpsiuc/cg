@@ -27,4 +27,4 @@ for i, N in enumerate(grid_sizes):
     cbar.set_label(r"$u(x,y)$")
 
 plt.tight_layout()
-plt.savefig("solutions-.png")
+plt.savefig("solutions-1.png")
