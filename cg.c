@@ -160,6 +160,22 @@ void test() {
   free(y2);
 }
 
+// Write the computed solution to a file that can be used for plotting
+void write_solution(double* u, int N, const char* filename) {
+  double h  = 1.0 / ((double) N + 1);
+  FILE*  fp = fopen(filename, "w");
+  for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+      int    index   = j * N + i;
+      double x_coord = (i + 1) * h;
+      double y_coord = (j + 1) * h;
+      fprintf(fp, "%f %f %f\n", x_coord, y_coord, u[index]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+}
+
 // Conjugate gradient algorithm
 void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
         double* final_residual) {
@@ -172,7 +188,7 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
 
   // Initialise to zeros (i.e., our initial guess)
   for (int i = 0; i < size; i++) {
-    x[i] = 0.0;
+    x[i] = 1.0;
   }
 
   // r_0=b-Ax_0=b, since x_0=0
@@ -269,6 +285,11 @@ int main() {
 
     printf("%d\t%d\t\t%.6f\t%.10e\n", N, iter_count, time_spent,
            final_residual);
+
+    // For one grid size, we output the solution to a file for plotting
+    if (N == 128) {
+      write_solution(x, N, "solution.dat");
+    }
 
     // Free memory
     free(b);
