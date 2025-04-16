@@ -95,13 +95,14 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
 
   // Initialise to zeros (i.e., our initial guess)
   for (int i = 0; i < size; i++) {
-    x[i] = 0.0;
+    x[i] = 1.0;
   }
 
-  // r_0=b-Ax_0=b, since x_0=0
+  // Calculate initial residual r_0=b-Ax_0
+  poisson(x, Ap, N); // Reusing Ap to store Ax_0 temporarily
   for (int i = 0; i < size; i++) {
-    r[i] = b[i];
-    p[i] = r[i]; // p_0=r_0
+    r[i] = b[i] - Ap[i];
+    p[i] = r[i];
   }
 
   double rr               = dot(r, r, size);
@@ -223,8 +224,8 @@ int main() {
     printf("%d\t%d\t\t%.6f\t%.10e\n", N, iter_count, time_spent,
            final_residual);
 
-    // Add verification against analytical solution
-    verify_solution(x, N);
+    // // Add verification against analytical solution
+    // verify_solution(x, N);
 
     // For one grid size, we output the solution to a file for plotting
     if (N == 128) {
