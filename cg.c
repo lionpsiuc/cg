@@ -1,9 +1,25 @@
+/**
+ * @file cg.c
+ *
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-// Dot product
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 double dot(double* x, double* y, int size) {
   double result = 0.0;
   for (int i = 0; i < size; i++) {
@@ -12,13 +28,28 @@ double dot(double* x, double* y, int size) {
   return result;
 }
 
-// Function given in assignment
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 double f(double x1, double x2) {
   return 2.0 * M_PI * M_PI * sin(M_PI * x1) * sin(M_PI * x2);
 }
 
-// Optimised method of calculting Ax; instead of storing A, we multiply directly
-// using this function
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void poisson(double* x, double* y, int N) {
   double h      = 1.0 / ((double) N + 1); // Grid spacing
   double h2_inv = 1.0 / (h * h);
@@ -53,8 +84,15 @@ void poisson(double* x, double* y, int N) {
   }
 }
 
-// Method to calculate the right-hand side vector as per the five-point stencil
-// approximation
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void rhs(double* b, int N, double (*f)(double, double)) {
   double h = 1.0 / ((double) N + 1);
   for (int j = 0; j < N; j++) {
@@ -67,7 +105,15 @@ void rhs(double* b, int N, double (*f)(double, double)) {
   }
 }
 
-// Write the computed solution to a file that can be used for plotting
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void write_solution(double* u, int N, const char* filename) {
   double h  = 1.0 / ((double) N + 1);
   FILE*  fp = fopen(filename, "w");
@@ -83,7 +129,15 @@ void write_solution(double* u, int N, const char* filename) {
   fclose(fp);
 }
 
-// Conjugate gradient algorithm
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
         double* final_residual) {
   int size = N * N;
@@ -154,12 +208,28 @@ void cg(double* b, double* x, int N, double tol, int max_iter, int* iter_count,
   *final_residual = sqrt(rr);
 }
 
-// Known analytical solution
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 double analytical_solution(double x1, double x2) {
   return sin(M_PI * x1) * sin(M_PI * x2);
 }
 
-// Function to verify numerical solution against analytical solution
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void verify_solution(double* numerical, int N) {
   double h         = 1.0 / ((double) N + 1);
   double max_error = 0.0;
@@ -184,7 +254,15 @@ void verify_solution(double* numerical, int N) {
   printf("L2 error: %.10e\n\n", l2_error);
 }
 
-// Function to write the analytical solution to a file for plotting
+/**
+ * @brief Brief explanation.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return Brief explanation.
+ */
 void write_analytical_solution(int N, const char* filename) {
   double h  = 1.0 / ((double) N + 1);
   FILE*  fp = fopen(filename, "w");
@@ -200,6 +278,15 @@ void write_analytical_solution(int N, const char* filename) {
   fclose(fp);
 }
 
+/**
+ * @brief Main function.
+ *
+ * Further explanation, if required.
+ *
+ * @param[in/out/in,out] param Brief explanation.
+ *
+ * @return 0 upon successful execution.
+ */
 int main() {
   int    N_values[] = {8, 16, 32, 64, 128, 256};
   int    num_N      = sizeof(N_values) / sizeof(N_values[0]);
