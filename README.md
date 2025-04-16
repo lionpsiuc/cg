@@ -9,6 +9,9 @@
       - [Finite Difference Approximation](#finite-difference-approximation)
       - [Ordering of the Grid Points](#ordering-of-the-grid-points)
 - [Folder Structure and Usage Details](#folder-structure-and-usage-details)
+  - [Key Components](#key-components)
+  - [Usage Instructions](#usage-instructions)
+  - [Output Files](#output-files)
 - [Serial Implementation of the Conjugate Gradient Algorithm](#serial-implementation-of-the-conjugate-gradient-algorithm)
   - [Mathematical Explanation for Convergence in One Iteration](#mathematical-explanation-for-convergence-in-one-iteration)
   - [Updated Solution](#updated-solution)
@@ -64,7 +67,40 @@ We use row-major ordering:
 
 ### Folder Structure and Usage Details
 
+#### Key Components
 
+- `cg.c`: The main implementation of the CG solver.
+- `numerical.py` and `analytical.py`: These Python scripts visualise the computed solutions and analytical solutions, respectively. They read the `.dat` files produced by `cg.c` and generate heatmaps for different grid sizes.
+
+#### Usage Instructions
+
+- **Build and Run Everything**:
+
+    ```bash
+    make run
+    ```
+
+  Alternatively, one can build without running:
+
+    ```bash
+    make
+    ```
+
+- **Clean**:
+
+    ```bash
+    make clean
+    ```
+
+#### Output Files
+
+The programme generates numerous output files:
+
+- `solution-N.dat`: Contains the numerical solution for grid size `N`.
+- `analytical-N.dat`: Contains the analytical solution for grid size `N`.
+- `numerical-0.png`: Visualisation of all numerical solutions in the case where our initial guess is a vector of zeros (it is included for verification purposes).
+- `numerical-1.png`: Visualisation of all numerical solutions in the case where our initial guess is a vector of ones (this is the implementation which is present in `cg.c`).
+- `analytical.png`: Visualisation of all analytical solutions in the case where our initial guess is a vector of ones.
 
 ### Serial Implementation of the Conjugate Gradient Algorithm
 
