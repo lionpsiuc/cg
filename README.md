@@ -202,10 +202,29 @@ N       Iterations      Time (s)        Final Residual
 
 We plot all six (i.e., for $N=8,\ldots,256$) resulting functions $u(x)$ for both cases (i.e., the one where it terminates in one iteration, and the other where we updated our initial guess). The first is for the case where we have an initial guess of zeros (i.e., the algorithm terminating in one iteration) and the second is for the updated case where we have a proper number of iterations:
 
-![Solutions when our initial guess is a vector of zeros](solutions-0.png)
-![Solutions when our initial guess is a vector of ones](solutions-1.png)
+![Solutions when our initial guess is a vector of zeros](numerical-0.png)
+![Solutions when our initial guess is a vector of ones](numerical-1.png)
 
 As we can see, they are essentially identical.
 
+For comparison, we present the analytical solution for each $N$ below:
+
+![Analytical solutions](analytical.png)
+
 #### Discussion of Findings
 
+We can organise the above findings into a set of important observations:
+
+1. **Convergence Behaviour**:
+
+    - With an initial guess of $\mathbf{x_0}=\mathbf{0}$, the algorithm converges in just one iteration due to the specific properties of the Poisson problem with the given right-hand side. This occurs because the right-hand side vector $\mathbf{b}$ is an eigenvector of the discrete Laplacian matrix A, making the initial residual perfectly aligned with the optimal search direction.
+    - With an initial guess of $\mathbf{x_0}=\mathbf{1}$, we observe the more typical behaviour of the CG algorithm, requiring multiple iterations to converge.
+
+2. **Scaling with Problem Size**:
+
+    - The number of iterations approximately doubles as $N$ doubles (from `10` iterations at $N=8$ to `454` iterations at $N=256$). This suggests an $\mathcal{O}(N)$ scaling for iteration count.
+    - The time complexity increases more rapidly than the iteration count, following approximately $\mathcal{O}(N^2)$ scaling. This is expected since each iteration involves matrix-vector operations that scale with the system size (i.e., $N^2$).
+
+3. **Computational Efficiency**:
+
+    - The implementation avoids storing the full matrix $A$ explicitly, instead using the `poisson` function to compute matrix-vector products directly. This approach significantly reduces memory requirements from $\mathcal{O}(N^4)$ to $\mathcal{O}(N^2)$.
