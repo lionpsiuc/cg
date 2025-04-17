@@ -86,6 +86,8 @@ For `dense/`, it is as follows:
 
 #### Usage Instructions
 
+> All results were obtained using a 13th Gen Intel(R) Core(TM) i5-13400F with a base clock speed of 2.50 GHz.
+
 Note that there is a separate `Makefile` in each directory. For `sparse/` and `dense/`, we have the following:
 
 - **Build and Run Everything**:
@@ -321,8 +323,23 @@ outputs the following:
 Condition number for N = 1000: 1351031.1299646497
 ```
 
-The condition numbers are then hard-coded into `plot.py` where the theoretical bounds are also calculated. We present the requested plot below:
+The condition numbers are then hard-coded into `plot.py` where the theoretical bounds are also calculated. Moreover, running `dense/cg.c` gives us the following:
+
+```bash
+N       Iterations      Final Residual  Convergence Factor
+----------------------------------------------------------
+100     49              8.0467844313e-08        0.424660
+1000    336             4.3013652600e-07        0.576069
+10000   2491            1.4713437357e-06        0.609490
+```
+
+We present the requested plot below:
 
 ![Convergence of residuals](dense/convergence.png)
 
-We can see that the theoretical bounds are quite conservative. The bound given is one where every iteration makes the minimal possible progress permitted as per the theory. This bound is one where the eigenvalues are distributed in the worst possible way. Moreover, the initial error has components in all eigendirections and if it is heavily weighted toward these extremes, then convergence will be slower.
+We can see that the theoretical bounds are quite conservative. The bound given is one where every iteration makes the minimal possible progress permitted as per the theory. This bound is one where the eigenvalues are distributed in the worst possible way. Moreover, the initial error has components in all eigendirections and if it is heavily weighted toward these extremes, then convergence will be slower. We can organise the explanation for this behaviour as follows:
+
+- **Nature of the Theoretical Bound**: As mentioned before, the given bound is forgiving in terms of its derivation (i.e., it assumes that the initial error has significant components in the eigenvectors corresponding to these extreme eigenvalues).
+- **Actual Eigenvalue Distribution**: For our dense matrix, the eigenvalues are not just at the extremes, but distributed throughout the spectrum, and CG can eliminate error components corresponding to well-separated eigenvalues very efficiently.
+- **Effective Conditioning**: The theoretical bound uses the full condition number but in practice CG behaves as if it were solving a problem with a much smaller condition number.
+- **Initial Guess**: Our initial guess, along with our specific right-hand side vector, may lead to an initial error that has small components in the extreme eigendirections, which leads to faster convergence.
